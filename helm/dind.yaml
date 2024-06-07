@@ -1,0 +1,13 @@
+githubConfigSecret: action-runner-dind
+githubConfigUrl: https://github.com/wsd-team-dev
+minRunners: 2
+maxRunners: 4
+containerMode:
+  type: dind
+template:
+  spec:
+    containers:
+    - command:
+      - /home/runner/run.sh
+      image: ghcr.io/wsd-team-devops/github-runner:2.316.1
+      name: runner
