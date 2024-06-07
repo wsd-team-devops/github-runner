@@ -1,12 +1,12 @@
 # Source: https://github.com/dotnet/dotnet-docker
 FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-jammy as build
 
-ARG TARGETOS
-ARG TARGETARCH
-ARG RUNNER_VERSION
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
+ARG RUNNER_VERSION=2.316.0
 ARG RUNNER_CONTAINER_HOOKS_VERSION=0.6.0
-ARG DOCKER_VERSION=25.0.5
-ARG BUILDX_VERSION=0.13.2
+ARG DOCKER_VERSION=25.0.4
+ARG BUILDX_VERSION=0.13.1
 
 RUN apt update -y && apt install curl unzip -y
 
@@ -39,14 +39,22 @@ ENV RUNNER_MANUALLY_TRAP_SIG=1
 ENV ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT=1
 ENV ImageOS=ubuntu22
 
-# 'gpg-agent' and 'software-properties-common' are needed for the 'add-apt-repository' command that follows
-RUN apt update -y \
-    && apt install -y --no-install-recommends sudo lsb-release gpg-agent software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y \
+    && apt install wget curl -y && apt-get install git gnupg -y \
+    && apt-get install -y --no-install-recommends \
+    sudo \
+    lsb-release
 
-# Configure git-core/ppa based on guidance here:  https://git-scm.com/download/linux
-RUN add-apt-repository ppa:git-core/ppa \
-    && apt update -y
+RUN apt install nodejs -y
+RUN apt install npm -y
+RUN npm install --global yarn
+
+RUN rm -rf /var/lib/apt/lists/*
+
+COPY solvians-ca-2017.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+#RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 
 RUN adduser --disabled-password --gecos "" --uid 1001 runner \
     && groupadd docker --gid 123 \
