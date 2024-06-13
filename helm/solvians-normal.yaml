@@ -1,5 +1,5 @@
 githubConfigUrl: "https://github.com/wsd-team-dev"
-githubConfigSecret: "github-runner-secret"
+githubConfigSecret: "solvians-runner-secret"
 minRunners: 3
 maxRunners: 6
 template:

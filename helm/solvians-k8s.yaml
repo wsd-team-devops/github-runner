@@ -1,0 +1,49 @@
+githubConfigUrl: https://github.com/wsd-team-dev
+githubConfigSecret: dind-runner-secret
+#controllerServiceAccount:
+#  namespace: arc-system
+  # Name must line up with the above chart release name eg `github-actions-scale-set-controller`. Install the above chart and see what SA name it makes.
+#  name: arc-gha-rs-controller
+minRunners: 1
+maxRunners: 4
+containerMode:
+  type: kubernetes
+template:
+  spec:
+    # We must add an init container to change the ownership of the _work directory
+    # https://docs.github.com/en/enterprise-server@3.9/actions/hosting-your-own-runners/managing-self-hosted-runners-with-actions-runner-controller/troubleshooting-actions-runner-controller-errors#error-access-to-the-path-homerunner_work_tool-is-denied
+    initContainers:
+    - name: kube-init
+      image: ghcr.io/actions/actions-runner:latest
+      command: ["sudo", "chown", "-R", "1001:123", "/home/runner/_work"]
+      volumeMounts:
+      - name: work
+        mountPath: /home/runner/_work
+    containers:
+    - name: runner
+      image: "ghcr.io/wsd-team-devops/github-runner:2.317.0"
+      command:
+      - /home/runner/run.sh
+      env:
+      - name: ACTIONS_RUNNER_CONTAINER_HOOKS
+        value: /home/runner/k8s/index.js
+      - name: ACTIONS_RUNNER_POD_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+        value: "false"
+      volumeMounts:
+      - name: work
+        mountPath: /home/runner/_work
+    volumes:
+    - name: work
+      ephemeral:
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            # Critical change here compared to the docs. EKS does not support "local-storage" by default.
+            storageClassName: "local-storage"
+            resources:
+              requests:
+                storage: 1Gi

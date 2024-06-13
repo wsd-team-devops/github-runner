@@ -1,5 +1,5 @@
-githubConfigSecret: aws-dind-secret
-githubConfigUrl: https://github.com/wsd-team-dev
+githubConfigSecret: "aws-dind-secret"
+githubConfigUrl: "https://github.com/wsd-team-dev"
 minRunners: 2
 maxRunners: 4
 containerMode:

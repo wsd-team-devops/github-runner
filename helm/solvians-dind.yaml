@@ -1,6 +1,6 @@
-githubConfigSecret: action-runner-dind
-githubConfigUrl: https://github.com/wsd-team-dev
-minRunners: 2
+githubConfigSecret: "dind-runner-secret"
+githubConfigUrl: "https://github.com/wsd-team-dev"
+minRunners: 1
 maxRunners: 4
 containerMode:
   type: dind
