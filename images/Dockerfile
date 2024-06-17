@@ -54,6 +54,9 @@ RUN add-apt-repository ppa:git-core/ppa \
 
 RUN rm -rf /var/lib/apt/lists/*
 
+RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && \
+    chmod +x /usr/bin/yq
+
 COPY solvians-ca-2017.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
