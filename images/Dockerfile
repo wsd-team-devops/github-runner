@@ -41,7 +41,7 @@ ENV ImageOS=ubuntu22
 
 # 'gpg-agent' and 'software-properties-common' are needed for the 'add-apt-repository' command that follows
 RUN apt update -y \
-    && apt install -y --no-install-recommends sudo lsb-release gpg-agent software-properties-common wget curl gnupg
+    && apt install -y --no-install-recommends sudo lsb-release gpg-agent software-properties-common wget curl gnupg buildah podman
 
 RUN apt install nodejs npm -y
 

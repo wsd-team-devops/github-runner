@@ -1,17 +1,11 @@
 githubConfigUrl: https://github.com/wsd-team-dev
-githubConfigSecret: dind-runner-secret
-#controllerServiceAccount:
-#  namespace: arc-system
-  # Name must line up with the above chart release name eg `github-actions-scale-set-controller`. Install the above chart and see what SA name it makes.
-#  name: arc-gha-rs-controller
-minRunners: 1
-maxRunners: 4
+githubConfigSecret: k8s-runner-secret
+runnerScaleSetName: "solvians-runner"
+minRunners: 2
 containerMode:
   type: kubernetes
 template:
   spec:
-    # We must add an init container to change the ownership of the _work directory
-    # https://docs.github.com/en/enterprise-server@3.9/actions/hosting-your-own-runners/managing-self-hosted-runners-with-actions-runner-controller/troubleshooting-actions-runner-controller-errors#error-access-to-the-path-homerunner_work_tool-is-denied
     initContainers:
     - name: kube-init
       image: ghcr.io/actions/actions-runner:latest
@@ -21,7 +15,7 @@ template:
         mountPath: /home/runner/_work
     containers:
     - name: runner
-      image: "ghcr.io/wsd-team-devops/github-runner:2.317.0"
+      image: "ghcr.io/wsd-team-devops/github-runner:2.317.0-1.0.0"
       command:
       - /home/runner/run.sh
       env:
@@ -42,8 +36,7 @@ template:
         volumeClaimTemplate:
           spec:
             accessModes: [ "ReadWriteOnce" ]
-            # Critical change here compared to the docs. EKS does not support "local-storage" by default.
-            storageClassName: "local-storage"
+            storageClassName: "longhorn"
             resources:
               requests:
-                storage: 1Gi
+                storage: 5Gi
