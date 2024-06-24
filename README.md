@@ -10,6 +10,9 @@ Software installed:
 2. Nodejs
 3. Git
 4. Self-signed Solvians CA cert
+5. buildah
+6. podman
+7. yq
 
 Upgrade Process:
 1. Upgrade arc controller
