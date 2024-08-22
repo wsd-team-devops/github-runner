@@ -41,16 +41,22 @@ ENV ImageOS=ubuntu22
 
 # 'gpg-agent' and 'software-properties-common' are needed for the 'add-apt-repository' command that follows
 RUN apt update -y \
-    && apt install -y --no-install-recommends sudo lsb-release gpg-agent software-properties-common wget curl gnupg buildah podman
+    && apt install -y --no-install-recommends sudo lsb-release gpg-agent software-properties-common wget curl gnupg buildah podman \
+    && sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+    && sudo chmod +x /usr/local/bin/docker-compose 
 
 RUN apt install nodejs npm -y
 
 RUN npm install --global yarn
 
 # Configure git-core/ppa based on guidance here:  https://git-scm.com/download/linux
+ENV PIP_ROOT_USER_ACTION=ignore
+
 RUN add-apt-repository ppa:git-core/ppa \
     && apt update -y \
-    && apt install git -y
+    && apt install git -y \
+    && apt-get install -y python3-pip openssh-client \
+    && python3 -m pip install --no-cache-dir ansible ansible-lint 
 
 RUN rm -rf /var/lib/apt/lists/*
 
